@@ -117,7 +117,7 @@ class _ButterfliesListState extends State<ButterfliesList> {
                   hintText: "Введите название бабочки",
               //при нажатии на иконку в конце поля ввода появляется
               //список подсказок-названий бабочек
-              suffixIcon: PopupMenuButton<String>(
+              suffixIcon: PopupMenuButton(
                 //при выборе подсказки
                 onSelected: (String value) {
                   setState(() {
@@ -131,7 +131,7 @@ class _ButterfliesListState extends State<ButterfliesList> {
                 itemBuilder: (BuildContext context) {
                   //получение списка подсказок из класса
                   var _items = Butterfly.getPromptList();
-
+                  //список элементов для PopupMenuButton
                   return _items.map((String value) {
                     return PopupMenuItem(
                       value: value,
