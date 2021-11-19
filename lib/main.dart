@@ -87,14 +87,17 @@ class _ButterfliesListState extends State<ButterfliesList> {
 
   var _controller = TextEditingController();
 
-  //попытка получить описание бабочки name из массива бабочек
-  String _getDescription(String name) {
+  int _selectedIndex = -1;
+
+  //попытка найти индекс бабочки name из массива бабочек
+  int _getIndex(String name) {
     if (Butterfly.isNameValid(name)) {
       for (Butterfly b in _bClassList) {
-        if (b.name == name) return b.description;
+        if (b.name == name) return _bClassList.indexOf(b);
       }
     }
-    return "Такой бабочки нет в списке";
+    return -1;
+    //return "Такой бабочки нет в списке";
   }
 
   @override
@@ -106,7 +109,7 @@ class _ButterfliesListState extends State<ButterfliesList> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(child: Container(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         children: [
@@ -118,13 +121,15 @@ class _ButterfliesListState extends State<ButterfliesList> {
               //при нажатии на иконку в конце поля ввода появляется
               //список подсказок-названий бабочек
               suffixIcon: PopupMenuButton(
-                //при выборе подсказки
+                //при выборе бабочки
                 onSelected: (String value) {
                   setState(() {
-                    //подсказка записывается в поле
+                    //имя бабочки записывается в поле
                     _controller.text = value;
-                    //и ниже выводится описание выбранной бабочки
-                    _description = _getDescription(value);
+                    //вычисляется индекс бабочки с выбранным именем
+                    _selectedIndex = _getIndex(value);
+                    //описание бабочки выводится ниже
+                    _description = _bClassList[_selectedIndex].description;
                   });
                 },
                 icon: const Icon(Icons.help),
@@ -143,16 +148,66 @@ class _ButterfliesListState extends State<ButterfliesList> {
               )),
             onSubmitted: (String value) {
               setState(() {
-                _description = _getDescription(value);
+                //вычисляется индекс бабочки с введёным именем
+                _selectedIndex = _getIndex(value);
+                //если имя бабочки введено верно
+                if (_selectedIndex != -1) {
+                  //переменная заполняется её описанием
+                  _description = _bClassList[_selectedIndex].description;
+                }
+                //если введено не имя бабочки из имеющегося списка
+                else {
+                  _description = "Такой бабочки нет в списке";
+                }
               });
             }
           ),
-          const SizedBox(height: 50),
-          SingleChildScrollView(
-            child: Text(_description,
-              style: const TextStyle(fontSize: 20.0))
-          )
+          const SizedBox(height: 10),
+          Container(
+            height: 100.0,
+            child: ListView.separated(
+              padding: const EdgeInsets.all(20.0),
+              scrollDirection: Axis.horizontal,
+              separatorBuilder: (BuildContext context, int index) =>
+                const SizedBox(height: 100.0, width: 10.0),
+              itemCount: _bClassList.length,
+              itemBuilder: _createListView,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(_description,
+            style: const TextStyle(fontSize: 20.0))
         ],
+      ),
+    ));
+  }
+
+  Widget _createListView(BuildContext context, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState((){
+          //переменная заполняется описанием выбранной бабочки
+          _description = _bClassList[index].description;
+          //запоминается индекс выбранной бабочки
+          _selectedIndex = index;
+        });
+      },
+      child: Container(
+        child: Center(
+          child: Text("\u{1F98B}"+_bClassList[index].name,
+            style: const TextStyle(fontSize: 14.0),),),
+        height: 100.0,
+        width: 200.0,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          border: Border.all(
+            color: index == _selectedIndex
+                ? Colors.lightBlue
+                : Colors.black26,
+            width: 3.0
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(20.0))
+        ),
       ),
     );
   }
