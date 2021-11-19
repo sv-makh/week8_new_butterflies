@@ -75,11 +75,13 @@ class ButterfliesList extends StatefulWidget {
 }
 
 class _ButterfliesListState extends State<ButterfliesList> {
-
+  //переменная для массива бабочек
   var _bClassList = <Butterfly>[];
 
+  //что выводится под строчкой для поиска
   String _description = "";
 
+  //попытка получить описание бабочки name из массива бабочек
   String _getDescription(String name) {
     if (Butterfly.isNameValid(name)) {
       for (Butterfly b in _bClassList) {
@@ -91,6 +93,7 @@ class _ButterfliesListState extends State<ButterfliesList> {
 
   @override
   void initState() {
+    //массив бабочек инициализируется на старте
     _bClassList = Butterfly.getClassList();
     super.initState();
   }
@@ -102,15 +105,18 @@ class _ButterfliesListState extends State<ButterfliesList> {
       child: Column(
         children: [
           TextField(
-              onSubmitted: (String name) {
-                setState(() {
-                  _description = _getDescription(name);
-                });
-              }
+            decoration:
+              const InputDecoration(hintText: "Введите название бабочки"),
+            onSubmitted: (String name) {
+              setState(() {
+                _description = _getDescription(name);
+              });
+            }
           ),
           const SizedBox(height: 50),
           SingleChildScrollView(
-              child: Text(_description, style: const TextStyle(fontSize: 20.0))
+            child: Text(_description,
+              style: const TextStyle(fontSize: 20.0))
           )
         ],
       ),
