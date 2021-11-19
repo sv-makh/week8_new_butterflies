@@ -67,6 +67,10 @@ class Butterfly {
     return _butterflies.contains(name);
   }
 
+  //возвращает список бабочек для подсказки
+  static List<String> getPromptList() {
+    return _butterflies;
+  }
 }
 
 class ButterfliesList extends StatefulWidget {
@@ -80,6 +84,8 @@ class _ButterfliesListState extends State<ButterfliesList> {
 
   //что выводится под строчкой для поиска
   String _description = "";
+
+  var _controller = TextEditingController();
 
   //попытка получить описание бабочки name из массива бабочек
   String _getDescription(String name) {
@@ -105,11 +111,39 @@ class _ButterfliesListState extends State<ButterfliesList> {
       child: Column(
         children: [
           TextField(
+            controller: _controller,
             decoration:
-              const InputDecoration(hintText: "Введите название бабочки"),
-            onSubmitted: (String name) {
+              InputDecoration(
+                  hintText: "Введите название бабочки",
+              //при нажатии на иконку в конце поля ввода появляется
+              //список подсказок-названий бабочек
+              suffixIcon: PopupMenuButton<String>(
+                //при выборе подсказки
+                onSelected: (String value) {
+                  setState(() {
+                    //подсказка записывается в поле
+                    _controller.text = value;
+                    //и ниже выводится описание выбранной бабочки
+                    _description = _getDescription(value);
+                  });
+                },
+                icon: const Icon(Icons.help),
+                itemBuilder: (BuildContext context) {
+                  //получение списка подсказок из класса
+                  var _items = Butterfly.getPromptList();
+
+                  return _items.map((String value) {
+                    return PopupMenuItem(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList();
+
+                },
+              )),
+            onSubmitted: (String value) {
               setState(() {
-                _description = _getDescription(name);
+                _description = _getDescription(value);
               });
             }
           ),
